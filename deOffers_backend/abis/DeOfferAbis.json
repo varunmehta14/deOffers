@@ -1,0 +1,423 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_admin",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "offerId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "purchaser",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "timestamp",
+				"type": "uint256"
+			}
+		],
+		"name": "PurchaseOffer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_brand",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_dateExpired",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_brandImage",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_offerImage",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_totalStock",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_offerDiscount",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_category",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_code",
+				"type": "string"
+			}
+		],
+		"name": "addOffers",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "admin",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getAllOffers",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brand",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateAdded",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateExpired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brandImage",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "offerImage",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "availableStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "offerDiscount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "category",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "code",
+						"type": "string"
+					}
+				],
+				"internalType": "struct DeOffers.Offer[]",
+				"name": "allOffers",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_account",
+				"type": "address"
+			}
+		],
+		"name": "getMyOffers",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brand",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateAdded",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateExpired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brandImage",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "offerImage",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "availableStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "offerDiscount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "category",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "code",
+						"type": "string"
+					}
+				],
+				"internalType": "struct DeOffers.Offer[]",
+				"name": "allMyOffers",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_offerId",
+				"type": "uint256"
+			}
+		],
+		"name": "getOffer",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brand",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateAdded",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dateExpired",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "brandImage",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "offerImage",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "availableStock",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "offerDiscount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "category",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "code",
+						"type": "string"
+					}
+				],
+				"internalType": "struct DeOffers.Offer",
+				"name": "offer",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "offerCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_offerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "_purchaser",
+				"type": "address"
+			}
+		],
+		"name": "purchaseOffer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_admin",
+				"type": "address"
+			}
+		],
+		"name": "setAdmin",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_offerId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_dateExpired",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_brandImage",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_offerImage",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_offerDiscount",
+				"type": "uint256"
+			}
+		],
+		"name": "updateOffer",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
