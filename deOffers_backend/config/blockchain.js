@@ -62,17 +62,21 @@ const web3 = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.matic.toda
 const signer=web3.getSigner("0x9574a450194692E2C873AAd82297C075584488CD");
 // let privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
 let wallet = new ethers.Wallet(process.env.privateKey, web3);
-const deOffercontractAddress ="0x43Bb602D6a511c7df69AB4047AcB3a50e31447D1"
+const deOffercontractAddress ="0x7cF935BA201769C90003d0ce95a8d4bD0f80ea7C"
+//"0x43Bb602D6a511c7df69AB4047AcB3a50e31447D1"
 // '0xB7E090ec46E859BaD4ea0f56886c81683564c4b3'
-const DeOffer=require('../abis/DeOfferAbis.json')
-
+// const DeOffer=require('../abis/DeOfferAbis.json')
+const DeOffer=require('../abis/DeOff.json')
 let deOfferContract;
+let contractInterface;
 const initializeBlockchain = async () => {
     try {
-        console.log(signer.getAddress())
-        console.log(wallet)
+        // console.log(signer.getAddress())
+        // console.log(wallet)
         deOfferContract = new ethers.Contract(deOffercontractAddress, DeOffer, signer);
         deOfferContractWithSigner = new ethers.Contract(deOffercontractAddress, DeOffer, wallet);
+        contractInterface = new ethers.utils.Interface(DeOffer);
+        // console.log('interface********************',contractInterface)
         // console.log(deOfferContract)
 
     }
@@ -83,12 +87,15 @@ const initializeBlockchain = async () => {
 const getMethods = async () => {
   return { 
     deOfferContract,
-    deOfferContractWithSigner
+    deOfferContractWithSigner,
+    contractInterface,
   };
 };
 
 module.exports = {
   initializeBlockchain,
   web3,
+  wallet,
+  signer,
   getMethods,
 };

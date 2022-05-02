@@ -1,7 +1,80 @@
 // https://docs.ethers.io/v4/api-contract.html
-const {web3,getMethods} = require("../config/blockchain");
+// https://stackoverflow.com/questions/55154713/error-the-method-eth-sendtransaction-does-not-exist-is-not-available
+var abi = require('ethereumjs-abi')
+const ethers=require('ethers');
+var ethUtil=require("ethereumjs-util");
+const {web3,wallet,signer,getMethods} = require("../config/blockchain");
+const getSignatureParameters = signature => {
+    if (!ethers.utils.isHexString(signature)) {
+      throw new Error(
+          'Given value "'.concat(signature, '" is not a valid hex string.')
+      );
+    }
+    var r = signature.slice(0, 66);
+    var s = "0x".concat(signature.slice(66, 130));
+    var v = "0x".concat(signature.slice(130, 132));
+    v = ethers.BigNumber.from(v).toNumber();
+    if (![27, 28].includes(v)) v += 27;
+    return {
+      r: r,
+      s: s,
+      v: v
+    };
+  }; 
+const constructMetaTransactionMessage = (nonce, salt, functionSignature, contractAddress) => {
+    return abi.soliditySHA3(
+      ["uint256","address","uint256","bytes"],
+      [nonce, contractAddress, salt, ethUtil.toBuffer(Array.from((functionSignature)))]
+    );
+  }
+const writeHelper = async (deLibC,functionSignature, deLibInterface, gasLimit) => {
+    let nonce = await deLibC.getNonce(wallet.address);
+    console.log("fs",functionSignature);
+    let messageToSign = constructMetaTransactionMessage(parseInt(nonce), process.env.CHAINID, functionSignature,process.env.contractAddress);
+    
+    const signature = await wallet.signMessage(messageToSign);
+    console.info(`User signature is ${signature}`);
 
-
+    let { r, s, v } = getSignatureParameters(signature);
+  
+    let rawTx, tx;
+    rawTx = {
+      to: process.env.contractAddress,
+    //   data: deLibInterface.encodeFunctionData("executeMetaTransaction", [wallet.address, functionSignature, r, s, v]),
+      from: wallet.address,
+      gasLimit: gasLimit,
+    };
+    console.log("rawTx",rawTx);
+  console.log('wallet',wallet);
+    tx = await wallet.signTransaction(rawTx);
+    console.log("tx",tx);
+  
+    let transactionHash;
+    try {
+      let receipt = await signer.sendTransaction(tx);
+      console.log("receipt",receipt);
+    } 
+    catch (error) {
+      if (error.returnedHash && error.expectedHash) {
+        console.log("Transaction hash : ", error.returnedHash);
+        transactionHash = error.returnedHash;
+      } 
+      else {
+        console.log(error);
+        console.log("Error while sending transaction");
+      }
+    }
+  
+    if (transactionHash) {
+      // display transactionHash
+      let receipt = await signer.waitForTransaction(transactionHash);
+      console.log(receipt);
+      //show Success Message
+    } 
+    else {
+      console.log("Could not get transaction hash");
+    }
+  }
 exports.getAllOffers=async(req,res)=>{
     try {
       const {deOfferContract} =await getMethods();
@@ -31,16 +104,20 @@ exports.getAllOffers=async(req,res)=>{
 
   exports.createOffer=async(req,res)=>{
     try {
-      const  {deOfferContractWithSigner}=await getMethods();
+      const  {deOfferContractWithSigner,contractInterface}=await getMethods();
       const { brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code } = req.body;
       //await tokenContract.methods.approve(networkDataD.address, price).send({ from: account }).on('transactionHash', (hash) => {
     //   const gasP =await web3.eth.getGasPrice();
     //   let myEstimatedGas;
-    console.log(req.body);
-      await deOfferContractWithSigner
-          .addOffers(brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code
-            )
-          
+    console.log(contractInterface)
+    let functionSignature = contractInterface.encodeFunctionData("addOffers", [brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code]);
+    // console.log(req.body);
+    //   await deOfferContractWithSigner
+    //       .addOffers(brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code
+    //         )
+            const gasLimit = 500000;
+
+    await writeHelper(deOfferContractWithSigner, wallet, functionSignature, contractInterface, gasLimit);
     
     } catch (err) {
       res.send("err");
