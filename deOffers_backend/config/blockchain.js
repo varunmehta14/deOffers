@@ -57,9 +57,10 @@
 const ethers=require('ethers');
 require('dotenv').config;
 // const {ethereum}=process;
-const web3 = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.matic.today/');
+// const web3=ethers.getDefaultProvider();
+const web3 = new ethers.providers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
 // const provider=new ethers.providers.Web3Provider(ethereum);
-const signer=web3.getSigner("0x9574a450194692E2C873AAd82297C075584488CD");
+// const signer=web3.getSigner("0x9574a450194692E2C873AAd82297C075584488CD");
 // let privateKey = '0x0123456789012345678901234567890123456789012345678901234567890123';
 let wallet = new ethers.Wallet(process.env.privateKey, web3);
 const deOffercontractAddress ="0x7cF935BA201769C90003d0ce95a8d4bD0f80ea7C"
@@ -73,7 +74,7 @@ const initializeBlockchain = async () => {
     try {
         // console.log(signer.getAddress())
         // console.log(wallet)
-        deOfferContract = new ethers.Contract(deOffercontractAddress, DeOffer, signer);
+        // deOfferContract = new ethers.Contract(deOffercontractAddress, DeOffer, signer);
         deOfferContractWithSigner = new ethers.Contract(deOffercontractAddress, DeOffer, wallet);
         contractInterface = new ethers.utils.Interface(DeOffer);
         // console.log('interface********************',contractInterface)
@@ -96,6 +97,6 @@ module.exports = {
   initializeBlockchain,
   web3,
   wallet,
-  signer,
+//   signer,
   getMethods,
 };

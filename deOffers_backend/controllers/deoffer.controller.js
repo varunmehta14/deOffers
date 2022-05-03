@@ -27,7 +27,7 @@ const constructMetaTransactionMessage = (nonce, salt, functionSignature, contrac
       [nonce, contractAddress, salt, ethUtil.toBuffer(Array.from((functionSignature)))]
     );
   }
-const writeHelper = async (deLibC,functionSignature, deLibInterface, gasLimit) => {
+const writeHelper = async (deLibC,wallet,functionSignature, contractInterface, gasLimit) => {
     let nonce = await deLibC.getNonce(wallet.address);
     console.log("fs",functionSignature);
     let messageToSign = constructMetaTransactionMessage(parseInt(nonce), process.env.CHAINID, functionSignature,process.env.contractAddress);
@@ -40,12 +40,12 @@ const writeHelper = async (deLibC,functionSignature, deLibInterface, gasLimit) =
     let rawTx, tx;
     rawTx = {
       to: process.env.contractAddress,
-    //   data: deLibInterface.encodeFunctionData("executeMetaTransaction", [wallet.address, functionSignature, r, s, v]),
+    data: contractInterface.encodeFunctionData("executeMetaTransaction", [wallet.address, functionSignature, r, s, v]),
       from: wallet.address,
       gasLimit: gasLimit,
     };
-    console.log("rawTx",rawTx);
-  console.log('wallet',wallet);
+    // console.log("rawTx",rawTx);
+//   console.log('wallet',wallet);
     tx = await wallet.signTransaction(rawTx);
     console.log("tx",tx);
   
@@ -77,18 +77,18 @@ const writeHelper = async (deLibC,functionSignature, deLibInterface, gasLimit) =
   }
 exports.getAllOffers=async(req,res)=>{
     try {
-      const {deOfferContract} =await getMethods();
+      const {deOfferContractWithSigner} =await getMethods();
       console.log("body",req.body);
     //   console.log("here",deOfferContract)
       //let index=req.body.index;
       let offers=[];
       //let index;
      // index=app.get('/count')
-      const offersCount = await deOfferContract
+      const offersCount = await deOfferContractWithSigner
             .offerCount()
      console.log(offersCount.toNumber())  
     //   for(let   i=1;i<=offersCount.toNumber();i++){
-        const offer = await deOfferContract
+        const offer = await deOfferContractWithSigner
             .getAllOffers()
 
             console.log(offer)
@@ -102,6 +102,27 @@ exports.getAllOffers=async(req,res)=>{
     }
   }
 
+exports.updateOffer=async(req,res)=>{
+    try {
+      const  {deOfferContractWithSigner}=await getMethods();
+      const { offerId,description,dateExpired,brandImage,offerImage,offerDiscount } = req.body;
+      let tx =  await deOfferContractWithSigner
+          .updateOffer(offerId,description,dateExpired,brandImage,offerImage,offerDiscount,{
+                gasLimit: 500000,
+          }
+            );
+            console.log("Hash*********************",tx.hash);
+            if(tx.hash){
+                res.send(tx);
+            }
+
+    }
+    catch (err) {
+        res.send("err");
+       console.log(err);
+    }
+};
+
   exports.createOffer=async(req,res)=>{
     try {
       const  {deOfferContractWithSigner,contractInterface}=await getMethods();
@@ -109,31 +130,46 @@ exports.getAllOffers=async(req,res)=>{
       //await tokenContract.methods.approve(networkDataD.address, price).send({ from: account }).on('transactionHash', (hash) => {
     //   const gasP =await web3.eth.getGasPrice();
     //   let myEstimatedGas;
-    console.log(contractInterface)
-    let functionSignature = contractInterface.encodeFunctionData("addOffers", [brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code]);
+    // console.log(contractInterface)
+    // let functionSignature = contractInterface.encodeFunctionData("addOffers", [brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code]);
     // console.log(req.body);
-    //   await deOfferContractWithSigner
-    //       .addOffers(brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code
-    //         )
-            const gasLimit = 500000;
+    let tx =  await deOfferContractWithSigner
+          .addOffers(brand,description,dateExpired,brandImage,offerImage,totalStock,offerDiscount,category,code,{
+            
+                gasLimit: 500000,
+          }
+            );
+            console.log("Hash*********************",tx.hash);
+            // "0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364"
+            
+            // The operation is NOT complete yet; we must wait until it is mined
+            // await tx.wait();
+            if(tx.hash){
+                res.send(tx);
+            }
+            
+            // const gasLimit = 500000;
 
-    await writeHelper(deOfferContractWithSigner, wallet, functionSignature, contractInterface, gasLimit);
+    // await writeHelper(deOfferContractWithSigner, wallet, functionSignature, contractInterface, gasLimit);
     
     } catch (err) {
       res.send("err");
-      console.log(err);
+     console.log(err);
     }
   }
 
   exports.purchaseOffer=async(req,res)=>{
     try {
-      const  {deOfferContract}=await getMethods();
+      const  {deOfferContractWithSigner}=await getMethods();
       const {offerId,purchaser} = req.body;
       //await tokenContract.methods.approve(networkDataD.address, price).send({ from: account }).on('transactionHash', (hash) => {
       
-      await deOfferContract
-          .purchaseOffer(offerId,purchaser)
-      await deOfferContract.on("PurchaseOffer", (offerId, purchaser, timestamp, event) => {
+      await deOfferContractWithSigner
+          .purchaseOffer(offerId,purchaser,{
+            
+            gasLimit: 500000,
+      })
+      await deOfferContractWithSigner.on("PurchaseOffer", (offerId, purchaser, timestamp, event) => {
             // Called when anyone changes the value
         
             console.log(offerId);
@@ -159,11 +195,11 @@ exports.getAllOffers=async(req,res)=>{
 
   exports.getMyOffer=async(req,res)=>{
     try {
-      const  {deOfferContract}=await getMethods();
+      const  {deOfferContractWithSigner}=await getMethods();
       const {purchaser} = req.body;
       //await tokenContract.methods.approve(networkDataD.address, price).send({ from: account }).on('transactionHash', (hash) => {
         let myOffers=[];
-      const myOffer=await deOfferContract
+      const myOffer=await deOfferContractWithSigner
           .getMyOffers(purchaser)
           res.send(myOffer);
 
@@ -176,11 +212,11 @@ exports.getAllOffers=async(req,res)=>{
   }
   exports.offerById=async(req,res)=>{
     try {
-      const  {deOfferContract}=await getMethods();
+      const  {deOfferContractWithSigner}=await getMethods();
       const {offerId} = req.body;
       //await tokenContract.methods.approve(networkDataD.address, price).send({ from: account }).on('transactionHash', (hash) => {
         
-      const offer=await deOfferContract
+      const offer=await deOfferContractWithSigner
           .getOffer(offerId)
         res.send(offer);
 
